@@ -15,7 +15,7 @@
     <script>
         const socket = io();
 
-        // Escucha el evento para actualizar la lista en tiempo real
+        // Escucha el evento pars actualizar
         socket.on('actualizarProductos', (productos) => {
             const realTimeList = document.getElementById('realTimeList');
             realTimeList.innerHTML = '';
