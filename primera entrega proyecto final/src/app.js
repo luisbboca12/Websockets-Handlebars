@@ -2,7 +2,6 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const exphbs = require('express-handlebars').create;
-
 const path = require('path');
 
 const app = express();
@@ -24,21 +23,33 @@ const cartsRouter = require('./rutas/carts');
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 
+// Ruta para la vista index.handlebars
+app.get('/', (req, res) => {
+  const allProducts = productManager.getAllProducts();
+  res.render('index', { products: allProducts });
+});
+
+// Ruta para la vista en tiempo real con websockets
+app.get('/realtimeproducts', (req, res) => {
+  const allProducts = productManager.getAllProducts();
+  res.render('realTimeProducts', { products: allProducts });
+});
+
 // Configuración de WebSocket
 io.on('connection', (socket) => {
   console.log('Usuario conectado');
 
-  // Escucha eventos desde el cliente
-  socket.on('productoNuevo', () => {
-    // Actualiza la lista de productos y emite a todos los clientes conectados
-    io.emit('actualizarProductos', productManager.getAllProducts());
+// Escucha eventos desde el cliente
+socket.on('productoNuevo', () => {
+  // Actualiza la lista de productos
+  io.emit('actualizarProductos', productManager.getAllProducts());
   });
 
   socket.on('productoEliminado', () => {
-    // Actualiza la lista de productos y emite a todos los clientes conectados
+  // Actualiza la lista de productos 
     io.emit('actualizarProductos', productManager.getAllProducts());
   });
-
+  
   // Maneja la desconexión del usuario
   socket.on('disconnect', () => {
     console.log('Usuario desconectado');
